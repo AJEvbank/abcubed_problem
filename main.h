@@ -26,6 +26,8 @@ void print_solution(struct solution * solution);
 
 struct result * new_result(int sum, int x, int y);
 
-struct result * push_and_check(struct result * start, struct result * new, struct solution ** solutions, int * solution_counterA);
+struct solution * new_solution(int sum, int a, int b, int c, int d);
+
+struct result * push(struct result * start, struct result * new);
 
 #endif

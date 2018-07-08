@@ -4,17 +4,49 @@ int main(int argc, char ** argv)
 {
   /* Optimized solution */
 
-  struct result ** results = (struct result **)malloc(sizeof(struct result *) * HIGHEST * HIGHEST);
+  struct result ** results = (struct result **)malloc(sizeof(struct result *) * HIGHEST);
   struct solution ** solutions = (struct solution **)malloc(sizeof(struct solution *) * HIGHEST);
-  int x, y, solution_counterA = 0, temp_sum = 0;
-  for(x = 0; x < 10; x++) {
-    for(y = 0; y < 10; y++) {
-      temp_sum = (x * x * x) + (y * y * y);
-      results[temp_sum] = push_and_check(results[temp_sum],
-                                         new_result(temp_sum,x,y),
-                                         solutions,
-                                         &solution_counterA);
+  struct result * temp = NULL;
+  int a, b, c, d, solution_counterA = 0, temp_sum = 0;
+  int limit = (int)ceil(cbrt((double)HIGHEST));
+
+  printf("limit = %d\n",limit);
+  printf("\nOPTIMIZED\n");
+
+  /* a and b */
+  for(a = 0; a < limit; a++)
+  {
+    for(b = 0; b < limit; b++)
+    {
+      temp_sum = (a * a * a) + (b * b * b);
+      if (temp_sum >= HIGHEST) break;
+      results[temp_sum] = push(results[temp_sum], new_result(temp_sum,a,b));
     }
+  }
+
+  /* c and d */
+
+  for(c = 0; c < limit; c++)
+  {
+    for(d = 0; d < limit; d++)
+    {
+      temp_sum = (c * c * c) + (d * d * d);
+      if (temp_sum >= HIGHEST) break;
+      temp = results[temp_sum];
+      while (temp != NULL)
+      {
+        solutions[solution_counterA] = new_solution(temp -> sum, temp -> x, temp -> y, c, d);
+        solution_counterA++;
+        temp = temp -> next;
+      }
+    }
+  }
+
+  int i;
+  printf("\nsolutions\n");
+  for(i = 0; i < solution_counterA; i++)
+  {
+    print_solution(solutions[i]);
   }
 
 
@@ -25,14 +57,16 @@ int main(int argc, char ** argv)
 
   int A, B, C, D, LEFT_SUM = 0, RIGHT_SUM = 0;
   int solution_counterB = 0;
-  for(A = 0; A < 10; A++) {
-    for(B = 0; B < 10; B++) {
+
+  printf("\nBRUTE FORCE\n");
+  for(A = 0; A < limit; A++) {
+    for(B = 0; B < limit; B++) {
       LEFT_SUM = (A * A * A) + (B * B * B);
-      if (LEFT_SUM >= HIGHEST) continue;
-      for(C = 0; C < 10; C++) {
-        for(D = 0; D < 10; D++) {
+      if (LEFT_SUM >= HIGHEST) break;
+      for(C = 0; C < limit; C++) {
+        for(D = 0; D < limit; D++) {
           RIGHT_SUM = (C * C * C) + (D * D * D);
-          if (RIGHT_SUM >= HIGHEST) continue;
+          if (RIGHT_SUM >= HIGHEST) break;
           if (RIGHT_SUM == LEFT_SUM) {
             SOLUTIONS[solution_counterB] = (struct solution *)malloc(sizeof(struct solution));
             SOLUTIONS[solution_counterB] -> sum = LEFT_SUM;
@@ -47,10 +81,19 @@ int main(int argc, char ** argv)
       }
     }
   }
-  printf("Total brute force solutions = %d\n",solution_counterB + 1);
-  printf("Total ptimized force solutions = %d\n",solution_counterA + 1);
 
 
+  printf("Total optimized force solutions = %d\n",solution_counterA);
+  printf("Total brute force solutions = %d\n",solution_counterB);
+
+
+  printf("\nCOMPARISON\n");
+  // for(i = 0; i < solution_counterA; i++)
+  // {
+  //   parallel_print(solutions[i],SOLUTIONS[i]);
+  // }
+
+  
 
 
 
@@ -69,6 +112,20 @@ void print_solution(struct solution * solution) {
   return;
 }
 
+void parallel_print(struct solution * A, struct solution * B)
+{
+  printf("%d^3 + %d^3 = %d^3 + %d^3 = %d \n%d^3 + %d^3 = %d^3 + %d^3 = %d",A -> a,A -> b,A -> c,A -> d,A -> sum,
+                                                                            B -> a,B -> b,B -> c,B -> d,B -> sum);
+  if (A -> a == B -> b && A -> b == B -> b && A -> c == B -> c && A -> d == B -> d && A -> sum == B -> sum)
+  {
+    printf("\t\t-MATCH!!\n\n");
+  }
+  else
+  {
+    printf("\n\n");
+  }
+}
+
 struct result * new_result(int sum, int x, int y)
 {
   struct result * new = (struct result *)malloc(sizeof(struct result));
@@ -79,7 +136,18 @@ struct result * new_result(int sum, int x, int y)
   return new;
 }
 
-struct result * push_and_check(struct result * start, struct result * new, struct solution ** solutions, int * solution_counterA)
+struct solution * new_solution(int sum, int a, int b, int c, int d)
+{
+  struct solution * new = (struct solution *)malloc(sizeof(struct solution));
+  new -> sum = sum;
+  new -> a = a;
+  new -> b = b;
+  new -> c = c;
+  new -> d = d;
+  return new;
+}
+
+struct result * push(struct result * start, struct result * new)
 {
   if (start == NULL)
   {
@@ -88,20 +156,11 @@ struct result * push_and_check(struct result * start, struct result * new, struc
   else
   {
     struct result * temp = start;
-    while (temp != NULL)
+    while (temp -> next != NULL)
     {
-      if (temp -> sum == new -> sum)
-      {
-        solutions[*solution_counterA] = (struct solution *)malloc(sizeof(struct solution));
-        solutions[*solution_counterA] -> sum = new -> sum;
-        solutions[*solution_counterA] -> a = new -> x;
-        solutions[*solution_counterA] -> b = new -> y;
-        solutions[*solution_counterA] -> c = temp -> x;
-        solutions[*solution_counterA] -> d = temp -> y;
-        *solution_counterA = *solution_counterA + 1;
-      }
       temp = temp -> next;
-    }    
+    }
+    temp -> next = new;
     return start;
   }
 }
