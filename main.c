@@ -83,10 +83,6 @@ int main(int argc, char ** argv)
   }
 
 
-  printf("Total optimized force solutions = %d\n",solution_counterA);
-  printf("Total brute force solutions = %d\n",solution_counterB);
-
-
   printf("\nCOMPARISON\n");
   int j, bad_check = 0, error = 0;
   for(i = 0; i < solution_counterA; i++)
@@ -106,6 +102,8 @@ int main(int argc, char ** argv)
   }
   printf("error = %d\n",error);
 
+  printf("Total optimized force solutions = %d\n",solution_counterA);
+  printf("Total brute force solutions = %d\n",solution_counterB);
 
 
 
