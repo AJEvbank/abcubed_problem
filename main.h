@@ -11,7 +11,7 @@
 #include <time.h>
 #include "getopt.h"
 
-#define HIGHEST 1000
+#define HIGHEST 10000
 
 struct result {
 	int sum, x, y;
@@ -23,6 +23,8 @@ struct solution {
 };
 
 void print_solution(struct solution * solution);
+
+void parallel_print(struct solution * A, struct solution * B, int * bad_check);
 
 struct result * new_result(int sum, int x, int y);
 

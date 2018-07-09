@@ -88,12 +88,25 @@ int main(int argc, char ** argv)
 
 
   printf("\nCOMPARISON\n");
-  // for(i = 0; i < solution_counterA; i++)
-  // {
-  //   parallel_print(solutions[i],SOLUTIONS[i]);
-  // }
+  int j, bad_check = 0, error = 0;
+  for(i = 0; i < solution_counterA; i++)
+  {
+    bad_check = 1;
+    for(j = 0; j < solution_counterB; j++)
+    {
+      parallel_print(solutions[i], SOLUTIONS[j], &bad_check);
+    }
+    if (bad_check == 1)
+    {
+      error = 1;
+      printf("No match on i = %d\n",i);
+      print_solution(SOLUTIONS[i]);
+      printf("\n\n");
+    }
+  }
+  printf("error = %d\n",error);
 
-  
+
 
 
 
@@ -112,17 +125,14 @@ void print_solution(struct solution * solution) {
   return;
 }
 
-void parallel_print(struct solution * A, struct solution * B)
+void parallel_print(struct solution * A, struct solution * B, int * bad_check)
 {
-  printf("%d^3 + %d^3 = %d^3 + %d^3 = %d \n%d^3 + %d^3 = %d^3 + %d^3 = %d",A -> a,A -> b,A -> c,A -> d,A -> sum,
-                                                                            B -> a,B -> b,B -> c,B -> d,B -> sum);
-  if (A -> a == B -> b && A -> b == B -> b && A -> c == B -> c && A -> d == B -> d && A -> sum == B -> sum)
+  if (A -> a == B -> a && A -> b == B -> b && A -> c == B -> c && A -> d == B -> d && A -> sum == B -> sum)
   {
+    printf("%d^3 + %d^3 = %d^3 + %d^3 = %d \n%d^3 + %d^3 = %d^3 + %d^3 = %d",A -> a,A -> b,A -> c,A -> d,A -> sum,
+                                                                              B -> a,B -> b,B -> c,B -> d,B -> sum);
     printf("\t\t-MATCH!!\n\n");
-  }
-  else
-  {
-    printf("\n\n");
+    *bad_check = 0;
   }
 }
 
